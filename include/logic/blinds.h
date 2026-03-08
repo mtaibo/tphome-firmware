@@ -11,7 +11,7 @@
 #endif
 
 #define TOL 50 // Macro to compare different positions or times
-#define STOPPING_TIME 3000
+#define STOPPING_TIME 2000 // 2.00s - Macro for time running after reaching max position
 
 namespace Blinds {
 

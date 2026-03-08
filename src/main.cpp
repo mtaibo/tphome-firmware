@@ -1,4 +1,5 @@
 #include "settings.h"
+#include "network.h"
 #include "actions.h"
 
 #if defined(DEVICE_TYPE_BLIND)
@@ -10,9 +11,12 @@
 void setup() {
     Settings::setup();
     Hardware::setup();
+    Network::setup();
 }
 
 void loop() {
+
+    Network::update();
 
     /* Check inputs */
     Actions::check();
