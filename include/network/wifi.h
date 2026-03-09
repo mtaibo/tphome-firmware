@@ -68,14 +68,15 @@ namespace Wifi {
             /* After first connection, wait 60 secconds until next status check */
             if (now - _state.lastTime < 60000) return;
             
-            /* Disconnected after being connected */
+            /* Disconnected after being connected, do not reconnect until user ask for it */
             if (WiFi.status() != WL_CONNECTED) {
                 _state.isConnected = false;
                 _state.lastTime = now;
                 _state.attempts = 3;
-            } return; 
-        }
+            } 
 
+            return;
+        }
 
         /* While device is disconnected */
         if (WiFi.status() != WL_CONNECTED) {
