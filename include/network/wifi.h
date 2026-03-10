@@ -21,6 +21,11 @@ namespace Wifi {
 
     static State _state;
 
+    /* Public function for other modules to check if wifi is connected */
+    bool isConnected() {
+        return _state.isConnected;
+    }
+
     void setup() {
 
         /* Prevent the chip from reconnecting on its own */
@@ -91,7 +96,7 @@ namespace Wifi {
             } else if (_state.ledOn) {Leds::set(LED_GREEN, Leds::OFF); _state.ledOn = false;}
         } 
         
-        else { // WiFi is connected but _state.isConnected is false
+        else { // WiFi is connected but state.isConnected is false
             if (_state.ledOn) {Leds::set(LED_GREEN, Leds::OFF); _state.ledOn = false;}
             _state.isConnected = true;
             _state.attempts = 0;

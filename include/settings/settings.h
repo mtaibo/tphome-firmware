@@ -4,23 +4,6 @@
 #include <stdint.h> // Module for uint8_t and uint16_t
 #include "defaults.h"
 
-#if defined(DEVICE_TYPE_BLIND)
-
-    struct __attribute__((__packed__)) Prefs {
-        uint16_t upTime;
-        uint16_t downTime;
-        uint16_t downPosition;
-        bool invertedRelays;
-    };
-
-    struct __attribute__((__packed__)) State {
-        uint16_t currentPosition;
-    };
-
-#elif defined(DEVICE_TYPE_LIGHT)
-    struct __attribute__((__packed__)) Prefs {};
-    struct __attribute__((__packed__)) State {};
-#endif
 
 
 namespace Settings {
@@ -42,6 +25,24 @@ namespace Settings {
         char mqttPass[MQTT_SIZE];
         uint16_t mqttPort;
     };
+
+    #if defined(DEVICE_TYPE_BLIND)
+
+        struct __attribute__((__packed__)) Prefs {
+            uint16_t upTime;
+            uint16_t downTime;
+            uint16_t downPosition;
+            bool invertedRelays;
+        };
+
+        struct __attribute__((__packed__)) State {
+            uint16_t currentPosition;
+        };
+
+    #elif defined(DEVICE_TYPE_LIGHT)
+        struct __attribute__((__packed__)) Prefs {};
+        struct __attribute__((__packed__)) State {};
+    #endif
 
     extern Config config;
     extern Prefs prefs;
