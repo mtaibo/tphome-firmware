@@ -9,12 +9,15 @@
 namespace Mqtt {
 
     struct Topics {
-        char cmd[MQTT_SIZE];
-        char admin[MQTT_SIZE];
+        
+        /* Device topics */
+        char cmd[Sizes::MQTT];   // Subscribe to common orders
+        char admin[Sizes::MQTT]; // Subscribe to change settings
+        char state[Sizes::MQTT]; // Publish device state on each movement
 
-        char room[MQTT_SIZE];
-        char state[MQTT_SIZE];
-        char 
+        /* Group topics */
+        char room[Sizes::MQTT]; // Subscribe to room orders on same device type
+        char global[Sizes::MQTT]; // Subscribe to global orders on same device type
     };
 
     static Topics _topics;
@@ -43,17 +46,17 @@ namespace Mqtt {
     void setup() {
         
         /* Create device own topics for commands, administration and reporting state */
-        snprintf(_topics.cmd, sizeof(_topics.cmd), "tp/%s/c", Settings::config.deviceID);
-        snprintf(_topics.admin, sizeof(_topics.admin), "tp/%s/a", Settings::config.deviceID);
-        snprintf(_topics.state, sizeof(_topics.state), "tp/%s/s", Settings::config.deviceID);
+        snprintf(_topics.cmd,   Sizes::MQTT, "tp/%.5s/c",  Settings::config.deviceID);
+        snprintf(_topics.admin, Sizes::MQTT, "tp/%.5s/a",  Settings::config.deviceID);
+        snprintf(_topics.state, Sizes::MQTT, "tp/%.5s/s",  Settings::config.deviceID);
 
         /* Create group topics for device type,  */
+        snprintf(_topics.room,   Sizes::MQTT, "tp/%.3s/c", Settings::config.deviceID);
+        snprintf(_topics.global, Sizes::MQTT, "tp/%.1s/c", Settings::config.deviceID);
 
+        /* Setup the mqtt server */
         _client.setServer(Settings::config.mqttIP, Settings::config.mqttPort);
-        
-        /* Assign max buffer size and 64 more bytes to prevent collapse */
         _client.setBufferSize(sizeof(Settings::Prefs) + 64); 
-        
         _client.setCallback(callback);
     }
 

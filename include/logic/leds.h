@@ -26,14 +26,14 @@ namespace Leds {
 
     /* Array that stores every active led */
     inline LedState _states[4] = {
-        {NO_PIN}, {NO_PIN}, {NO_PIN}, {NO_PIN}  // Initialize _states with no pins
+        {Pins::NO_PIN}, {Pins::NO_PIN}, {Pins::NO_PIN}, {Pins::NO_PIN}  // Initialize _states with no pins
     }; 
 
     /* Function that provides the indicated led the indicated state */
     inline void set(uint8_t pin, Mode mode, Speed speed = MEDIUM, uint16_t blinks = 0, uint16_t duration = 0) {
         for (auto &state : _states) {
 
-            if (state.pin == pin || state.pin == NO_PIN) {
+            if (state.pin == pin || state.pin == Pins::NO_PIN) {
                 state.pin = pin;
                 state.mode = mode;
                 state.state = (mode == ON);
@@ -52,9 +52,9 @@ namespace Leds {
         for (auto &state : _states) {
 
             /* Set every pin on pins array to off and clean pins array */
-            if (state.pin != NO_PIN) {
+            if (state.pin != Pins::NO_PIN) {
                 Hardware::setState(state.pin, false);
-                state.pin = NO_PIN;
+                state.pin = Pins::NO_PIN;
             }
         }
     }
@@ -65,12 +65,12 @@ namespace Leds {
         for (auto &state : _states) { // Loop to update every active led
 
             /* If there is no pin on that led state slot, continue with other led */
-            if (state.pin == NO_PIN) continue;
+            if (state.pin == Pins::NO_PIN) continue;
 
             /* Duration control */
             if (state.offTime > 0 && now >= state.offTime) {
                 Hardware::setState(state.pin, false);
-                state.pin = NO_PIN; continue;
+                state.pin = Pins::NO_PIN; continue;
             } 
 
             /* If the pin mode is not blink, skip blinking control */
@@ -89,7 +89,7 @@ namespace Leds {
                     if (state.counter == 0) {
                         state.mode = OFF;
                         Hardware::setState(state.pin, false);
-                        state.pin = NO_PIN;
+                        state.pin = Pins::NO_PIN;
                     }
                 }
             }

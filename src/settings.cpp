@@ -13,9 +13,9 @@ namespace Settings {
     Preferences storage;
 
     void reboot() {
-        Leds::set(LED_TOP, Leds::BLINK, Leds::SLOW, 3);
-        Leds::set(LED_MID, Leds::BLINK, Leds::SLOW, 3);
-        Leds::set(LED_BTM, Leds::BLINK, Leds::SLOW, 3);
+        Leds::set(Pins::LED_TOP, Leds::BLINK, Leds::SLOW, 3);
+        Leds::set(Pins::LED_MID, Leds::BLINK, Leds::SLOW, 3);
+        Leds::set(Pins::LED_BTM, Leds::BLINK, Leds::SLOW, 3);
         ESP.restart();
     }
 
@@ -31,14 +31,14 @@ namespace Settings {
     void defaults() {
 
         /* --------------   Identification  -------------- */
-        strlcpy(config.deviceID, Defaults::ID, IDENTITY_SIZE);
+        strlcpy(config.deviceID, Defaults::ID, Sizes::ID);
 
         /* -----------------   Network   ----------------- */
-        strlcpy(config.wifiSSID, WIFI_SSID, WIFI_SIZE);
-        strlcpy(config.wifiPass, WIFI_PASS, WIFI_SIZE);
-        strlcpy(config.mqttIP, MQTT_IP, MQTT_SIZE);
-        strlcpy(config.mqttUser, MQTT_USER, MQTT_SIZE);
-        strlcpy(config.mqttPass, MQTT_PASS, MQTT_SIZE);
+        strlcpy(config.wifiSSID, WIFI_SSID, Sizes::WIFI);
+        strlcpy(config.wifiPass, WIFI_PASS, Sizes::WIFI);
+        strlcpy(config.mqttIP, MQTT_IP, Sizes::MQTT);
+        strlcpy(config.mqttUser, MQTT_USER, Sizes::MQTT);
+        strlcpy(config.mqttPass, MQTT_PASS, Sizes::MQTT);
         config.mqttPort = MQTT_PORT;
 
         /* --------  Preferences & Initial State  -------- */

@@ -22,7 +22,7 @@ namespace Buttons {
 
     /* Array that store every button with its corresponding next action */
     inline ButtonState _states[3] = {
-        {BTN_TOP, NONE}, {BTN_MID, NONE}, {BTN_BTM, NONE}
+        {Pins::BTN_TOP, NONE}, {Pins::BTN_MID, NONE}, {Pins::BTN_BTM, NONE}
     };
 
     /* Private function to translate duration to Action */

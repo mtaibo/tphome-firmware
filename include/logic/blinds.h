@@ -35,14 +35,14 @@ namespace Blinds {
             Hardware::RelayUp::off();
             Hardware::RelayDown::off();
             Settings::prefs.invertedRelays ? Hardware::RelayDown::on() : Hardware::RelayUp::on();
-            Leds::set(LED_TOP, Leds::ON);
+            Leds::set(Pins::LED_TOP, Leds::ON);
         }
 
         inline void down() {
             Hardware::RelayUp::off();
             Hardware::RelayDown::off();
             Settings::prefs.invertedRelays ? Hardware::RelayUp::on() : Hardware::RelayDown::on();
-            Leds::set(LED_BTM, Leds::ON);
+            Leds::set(Pins::LED_BTM, Leds::ON);
         }
 
         inline void stop() {
@@ -50,11 +50,11 @@ namespace Blinds {
             Hardware::RelayUp::off();
             Hardware::RelayDown::off();
 
-            Leds::set(LED_TOP, Leds::OFF);
-            Leds::set(LED_BTM, Leds::OFF);
+            Leds::set(Pins::LED_TOP, Leds::OFF);
+            Leds::set(Pins::LED_BTM, Leds::OFF);
 
-            if (_motor.state == MOVING) Leds::set(LED_MID, Leds::ON, Leds::MEDIUM, 0, 50);
-            else Leds::set(LED_MID, Leds::OFF);
+            if (_motor.state == MOVING) Leds::set(Pins::LED_MID, Leds::ON, Leds::MEDIUM, 0, 50);
+            else Leds::set(Pins::LED_MID, Leds::OFF);
 
             /* Save settings if there is not more movement */
             if (_motor.state == IDLE) Settings::saveState();

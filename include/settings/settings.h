@@ -5,22 +5,21 @@
 #include "defaults.h"
 
 
-
 namespace Settings {
 
     struct __attribute__((__packed__)) Config {
 
         // Identity
-        char deviceID[IDENTITY_SIZE];
+        char deviceID[Sizes::ID];
 
         // WiFi
-        char wifiSSID[WIFI_SIZE];
-        char wifiPass[WIFI_SIZE];
+        char wifiSSID[Sizes::WIFI];
+        char wifiPass[Sizes::WIFI];
 
         // MQTT
-        char mqttIP[MQTT_SIZE];
-        char mqttUser[MQTT_SIZE];
-        char mqttPass[MQTT_SIZE];
+        char mqttIP[Sizes::MQTT];
+        char mqttUser[Sizes::MQTT];
+        char mqttPass[Sizes::MQTT];
         uint16_t mqttPort;
     };
 

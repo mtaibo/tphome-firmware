@@ -14,19 +14,19 @@ namespace Actions {
 
         #if defined(DEVICE_TYPE_BLIND)
 
-            if (auto action = Buttons::getAction(BTN_TOP)) {
+            if (auto action = Buttons::getAction(Pins::BTN_TOP)) {
                 if (action == Buttons::SHORT) Blinds::Position::set(10000);
                 else if (action == Buttons::MEDIUM) Blinds::Position::set(Settings::prefs.downPosition);
                 else if (action == Buttons::LONG) Blinds::Position::set(Settings::state.currentPosition);
             }
 
-            else if (auto action = Buttons::getAction(BTN_MID)) {
+            else if (auto action = Buttons::getAction(Pins::BTN_MID)) {
                 if (action == Buttons::SHORT) Blinds::Relays::stop();
                 else if (action == Buttons::MEDIUM) Blinds::Position::set(Settings::state.currentPosition);
                 else if (action == Buttons::LONG) Blinds::Position::set(Settings::state.currentPosition);
             }
 
-            else if (auto action = Buttons::getAction(BTN_BTM)) {
+            else if (auto action = Buttons::getAction(Pins::BTN_BTM)) {
 
                 if (action == Buttons::SHORT) {
                     if (Settings::state.currentPosition > Settings::prefs.downPosition) {

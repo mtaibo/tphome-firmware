@@ -4,15 +4,13 @@
 #include <stdint.h>
 #include <string.h>
 
-/* ---  Network  ---- */
 #include "credentials.h"
 
-/* --- Config Sizes --- */
-#define IDENTITY_SIZE 16
-#define WIFI_SIZE     32
-#define MQTT_SIZE     24
-
-#define NO_PIN        255
+namespace Sizes {
+    static constexpr uint8_t ID    =  8;
+    static constexpr uint8_t MQTT  = 16;
+    static constexpr uint8_t WIFI  = 32;
+}
 
 namespace Defaults {
 

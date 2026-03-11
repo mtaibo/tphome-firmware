@@ -42,7 +42,7 @@ namespace Wifi {
         WiFi.begin(c.wifiSSID, c.wifiPass);
 
         /* First connection attempt */
-        Leds::set(LED_GREEN, Leds::BLINK, Leds::FAST);
+        Leds::set(Pins::LED_GREEN, Leds::BLINK, Leds::FAST);
         _state.lastTime = millis();
         _state.ledOn = true;
         _state.attempts = 1;
@@ -93,11 +93,11 @@ namespace Wifi {
                     _state.attempts++;
                     WiFi.begin(c.wifiSSID, c.wifiPass);
                 }
-            } else if (_state.ledOn) {Leds::set(LED_GREEN, Leds::OFF); _state.ledOn = false;}
+            } else if (_state.ledOn) {Leds::set(Pins::LED_GREEN, Leds::OFF); _state.ledOn = false;}
         } 
         
         else { // WiFi is connected but state.isConnected is false
-            if (_state.ledOn) {Leds::set(LED_GREEN, Leds::OFF); _state.ledOn = false;}
+            if (_state.ledOn) {Leds::set(Pins::LED_GREEN, Leds::OFF); _state.ledOn = false;}
             _state.isConnected = true;
             _state.attempts = 0;
             _state.lastTime = now;
