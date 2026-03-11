@@ -10,8 +10,11 @@ namespace Mqtt {
 
     struct Topics {
         char cmd[MQTT_SIZE];
+        char admin[MQTT_SIZE];
+
         char room[MQTT_SIZE];
         char state[MQTT_SIZE];
+        char 
     };
 
     static Topics _topics;
@@ -39,10 +42,12 @@ namespace Mqtt {
 
     void setup() {
         
-        /* Create topics */
-        snprintf(_topics.cmd, sizeof(_topics.cmd), "d/%s/c", Settings::config.deviceID);
-        snprintf(_topics.room, sizeof(_topics.room), "g/%s/c", Settings::config.room);
-        snprintf(_topics.state, sizeof(_topics.state), "d/%s/s", Settings::config.deviceID);
+        /* Create device own topics for commands, administration and reporting state */
+        snprintf(_topics.cmd, sizeof(_topics.cmd), "tp/%s/c", Settings::config.deviceID);
+        snprintf(_topics.admin, sizeof(_topics.admin), "tp/%s/a", Settings::config.deviceID);
+        snprintf(_topics.state, sizeof(_topics.state), "tp/%s/s", Settings::config.deviceID);
+
+        /* Create group topics for device type,  */
 
         _client.setServer(Settings::config.mqttIP, Settings::config.mqttPort);
         
