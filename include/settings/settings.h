@@ -4,7 +4,6 @@
 #include <stdint.h> // Module for uint8_t and uint16_t
 #include "defaults.h"
 
-
 namespace Settings {
 
     struct __attribute__((__packed__)) Config {

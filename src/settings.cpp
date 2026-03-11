@@ -67,27 +67,25 @@ namespace Settings {
     void save() {
 
         // Temp variables to store current config and prefs on the flash memory
-        Config currentStoredConfig;
-        Prefs currentStoredPrefs;
+        Config storedConfig;
+        Prefs storedPrefs;
 
         storage.begin("storage", false); // Open storage on write mode (false)
 
         // Load the more persistent settings divisions from storage to check if they
         // are the same as the intended to save
-        storage.getBytes("c", &currentStoredConfig, sizeof(Config));
-        storage.getBytes("p", &currentStoredPrefs, sizeof(Prefs));
+        storage.getBytes("c", &storedConfig, sizeof(Config));
+        storage.getBytes("p", &storedPrefs, sizeof(Prefs));
 
         // Save every settings division to storage if needed and check if every bit
-        // of information on current_stored_config and current config are the same.
-
-        if (memcmp(&config, &currentStoredConfig, sizeof(Config)) != 0)
+        // of information on storedConfig and storedConfig are the same.
+        if (memcmp(&config, &storedConfig, sizeof(Config)) != 0)
             storage.putBytes("c", &config, sizeof(Config));
 
-        if (memcmp(&prefs, &currentStoredPrefs, sizeof(Prefs)) != 0)
+        if (memcmp(&prefs, &storedPrefs, sizeof(Prefs)) != 0)
             storage.putBytes("p", &prefs, sizeof(Prefs));
 
         storage.putBytes("s", &state, sizeof(State));
-
         storage.end();
     }
 
@@ -97,15 +95,15 @@ namespace Settings {
         storage.begin("storage", true);
 
         // Load every settings division from storage
-        size_t r1 = storage.getBytes("c", &config, sizeof(Config));
-        size_t r2 = storage.getBytes("p", &prefs, sizeof(Prefs));
-        size_t r3 = storage.getBytes("s", &state, sizeof(State));
+        size_t sizeConfig = storage.getBytes("c", &config, sizeof(Config));
+        size_t sizePrefs = storage.getBytes("p", &prefs, sizeof(Prefs));
+        size_t sizeState = storage.getBytes("s", &state, sizeof(State));
 
         storage.end();
 
         // Check if every block on memory exists and corresponds to its real memory size
-        if (r1 != sizeof(Config) || r2 != sizeof(Prefs) || r3 != sizeof(State)) defaults();
+        if (sizeConfig != sizeof(Config) || sizePrefs != sizeof(Prefs) || sizeState != sizeof(State)) defaults();
     }
 
-    void setup() {defaults();}
+    void setup() {load();}
 }

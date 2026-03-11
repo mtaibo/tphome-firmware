@@ -10,8 +10,6 @@
 
 namespace Wifi {
 
-    auto &c = Settings::config;
-
     struct State {
         uint32_t lastTime = 0;
         uint8_t attempts = 0;
@@ -38,8 +36,8 @@ namespace Wifi {
 
         WiFi.mode(WIFI_STA); // WiFi Station mode, just connects to the router
 
-        WiFi.hostname(c.deviceID); // Show the deviceID as name on router
-        WiFi.begin(c.wifiSSID, c.wifiPass);
+        WiFi.hostname(Settings::config.deviceID); // Show the deviceID as name on router
+        WiFi.begin(Settings::config.wifiSSID, Settings::config.wifiPass);
 
         /* First connection attempt */
         Leds::set(Pins::LED_GREEN, Leds::BLINK, Leds::FAST);
@@ -91,7 +89,7 @@ namespace Wifi {
                 if (now - _state.lastTime > ATTEMPT_INTERVAL) {
                     _state.lastTime = now;
                     _state.attempts++;
-                    WiFi.begin(c.wifiSSID, c.wifiPass);
+                    WiFi.begin(Settings::config.wifiSSID, Settings::config.wifiPass);
                 }
             } else if (_state.ledOn) {Leds::set(Pins::LED_GREEN, Leds::OFF); _state.ledOn = false;}
         } 
