@@ -14,45 +14,35 @@ namespace Commands {
             STOP = 0xC2,
         };
 
-        enum class State : uint8_t {
-            IDLE        = 0x00,
-            MOVING_UP   = 0x01,
-            MOVING_DOWN = 0x02,
-            ERROR       = 0x03,
-        };
-
     #elif defined(DEVICE_TYPE_LIGHT)
     #endif
 
     /* Assign a new deviceID to an unconfigured device */
     struct __attribute__((packed)) DeviceID {
-        char    type;   // 'B', 'L', ...
-        uint8_t zone;   // 01–99
-        uint8_t device; // 01–99
+        char    type;
+        uint8_t zone;
+        uint8_t device;
     };
 
-    /* Device state report */
-    struct __attribute__((packed)) StatePayload {
-        uint8_t position;
-        State   state;
-    };
+    /* Report blind state while moving */
+    void publishState(uint8_t position, uint8_t state) {
 
-    /* Publish state */
-    void publishState(uint8_t position, State state) {
-        StatePayload payload { position, state };
+        struct __attribute__((packed)) State {
+            uint8_t position;
+            uint8_t state;
+        } payload {position, state};
+
         Mqtt::_client.publish(Mqtt::topics.state,
-                             reinterpret_cast<const uint8_t*>(&payload),
-                             sizeof(StatePayload));
+                            reinterpret_cast<const uint8_t*>(&payload),
+                            sizeof(State));
     }
 
     static void handleCmd(uint8_t cmd) {
 
         #if defined(DEVICE_TYPE_BLIND)
 
-            if (cmd <= 100) {
-                Blinds::Position::set(cmd * 100);
-                return;
-            }
+            if (cmd <= 100) {Blinds::Position::set(cmd * 100); return;}
+
             switch (static_cast<Cmd>(cmd)) {
                 case Cmd::UP:   Blinds::Position::set(10000);                        break;
                 case Cmd::DOWN: Blinds::Position::set(Settings::prefs.downPosition); break;
@@ -66,21 +56,24 @@ namespace Commands {
 
     void callback(char* topic, byte* payload, unsigned int length) {
 
-        /* When deviceID is in its default value, wait until 
-         * be configured to execute other commands */
-        if (strlen(Settings::config.deviceID) == 4) {
-            if (strcmp(topic, Mqtt::topics.def) != 0) return;
-            if (length != sizeof(DeviceID))            return;
+        if (length == 0) return;
 
+        /* Command for non-configured deviceID */
+        if (strlen(Settings::config.deviceID) == 4) {
+
+            if (strcmp(topic, Mqtt::topics.def) != 0) return; // Check topic
+            if (length != sizeof(DeviceID))           return; // Check length
+
+            /* Build new deviceID */
             const auto* id = reinterpret_cast<const DeviceID*>(payload);
             snprintf(Settings::config.deviceID, 6, "%c%02d%02d",
                      id->type, id->zone, id->device);
+
+            /* Reboot with new deviceID to build new topics */
             Settings::save();
             Settings::reboot();
             return;
         }
-
-        if (length == 0) return;
 
         /* Common commands on cmd, room and global topics */
         if (strcmp(topic, Mqtt::topics.cmd)    == 0 ||
