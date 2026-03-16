@@ -37,9 +37,17 @@ namespace Mqtt {
     static WiFiClient _wifiClient;
     static PubSubClient _client(_wifiClient);
 
+    void setCallback(MQTT_CALLBACK_SIGNATURE) {
+        _client.setCallback(callback);
+    }
+
+    bool isConnected() {
+        return _state.isConnected;
+    }
+
     void setup() {
 
-        /* When the device is not configured, its device ID is a default ID
+        /* When the device is not configured, its device ID has 4 hex digits
          * and the device has to subscribe to the def topic to get its new ID */
         if (strlen(Settings::config.deviceID) == 4) {
             snprintf(topics.def, Sizes::MQTT, "def/%.4s", Settings::config.deviceID);
@@ -60,6 +68,7 @@ namespace Mqtt {
         /* Setup the mqtt server with its credentials, max buffer and callback function */
         _client.setServer(Settings::config.mqttIP, Settings::config.mqttPort);
         _client.setBufferSize(sizeof(Settings::Prefs) + 64); 
+        _client.setSocketTimeout(4); 
     }
 
     void reconnect() {
@@ -85,44 +94,42 @@ namespace Mqtt {
             if (!_client.connected()) {
                 _state.isConnected = false;
                 _state.lastTime = now;
-                _state.attempts = 5;
             } 
 
             else _client.loop();
-
             return;
         }
 
         /* While device is disconnected */
         if (!_client.connected()) {
 
-            /* Set timeout depending on the number of attempts */
-            (_state.attempts > 3) ? _client.setSocketTimeout(2) : _client.setSocketTimeout(1);
-
+            /* First connection attempt: wait 3s to stabilize wifi connection */
+            if (_state.lastTime == 0) {_state.lastTime = now + 3000; return;}
 
             if (_state.attempts < 5) { // Not more than 5 attempts per manual reconnection
 
                 /* Check interval between attempts */
                 if (now - _state.lastTime > ATTEMPT_INTERVAL) {
 
-                    /* First attempt */
+                    /* First attempt, turn led on */
                     if (_state.ledOn == false) {
                         Leds::set(Pins::LED_GREEN, Leds::BLINK, Leds::SLOW);
                         _state.ledOn = true;
                     }
 
+                    _client.connect(Settings::config.deviceID, Settings::config.mqttUser, Settings::config.mqttPass);
+
                     _state.lastTime = now;
                     _state.attempts++;
-                    _client.connect(Settings::config.deviceID, Settings::config.mqttUser, Settings::config.mqttPass);
                 }
 
             } else if (_state.ledOn) {Leds::set(Pins::LED_GREEN, Leds::OFF); _state.ledOn = false;}
         } 
         
-        else { // Client is connected but state.isConnected is false == first connection
+        else { // Client is connected but state.isConnected is false === first connection
             if (_state.ledOn) {Leds::set(Pins::LED_GREEN, Leds::OFF); _state.ledOn = false;}
             _state.isConnected = true;
-            _state.attempts = 0;
+            _state.attempts = 5;
             _state.lastTime = now;
 
             if (strlen(Settings::config.deviceID) == 4) _client.subscribe(topics.def);

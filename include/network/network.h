@@ -8,27 +8,26 @@
 
 namespace Network {
 
-    static bool _wifiWasConnected = false;
-
     void inline setup() {
         Wifi::setup();
         Mqtt::setup();
+        Mqtt::setCallback(Commands::callback);
    }
 
     void inline update() {
         Wifi::update();
-        if (Wifi::isConnected()) {
-            if (!_wifiWasConnected) {
-                _wifiWasConnected = true;
-                Mqtt::reconnect();
-            }
-            Mqtt::update();
-        } else {
-            if (_wifiWasConnected) {
-                _wifiWasConnected = false;
-                Mqtt::reconnect();
-            }
-        }
+        if (Wifi::isConnected()) Mqtt::update();
+
+        if (Wifi::isConnected()) Leds::set(Pins::LED_MID, Leds::ON);
+        else Leds::set(Pins::LED_MID, Leds::OFF);
+
+        if (Mqtt::isConnected()) Leds::set(Pins::LED_BTM, Leds::ON);
+        else Leds::set(Pins::LED_BTM, Leds::OFF);
+    }
+
+    void inline reconnect() {
+        if (!Wifi::isConnected()) Wifi::reconnect();
+        else Mqtt::reconnect();
     }
 }
 
