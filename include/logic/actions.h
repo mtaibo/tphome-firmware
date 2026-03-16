@@ -17,13 +17,13 @@ namespace Actions {
             if (auto action = Buttons::getAction(Pins::BTN_TOP)) {
                 if (action == Buttons::SHORT) Blinds::Position::set(10000);
                 else if (action == Buttons::MEDIUM) Blinds::Position::set(Settings::prefs.downPosition);
-                else if (action == Buttons::LONG) Blinds::Position::set(Settings::state.currentPosition);
+                else if (action == Buttons::LONG) {}
             }
 
             else if (auto action = Buttons::getAction(Pins::BTN_MID)) {
                 if (action == Buttons::SHORT) Blinds::Relays::stop();
                 else if (action == Buttons::MEDIUM) Blinds::Position::set(Settings::state.currentPosition);
-                else if (action == Buttons::LONG) Blinds::Position::set(Settings::state.currentPosition);
+                else if (action == Buttons::LONG) {}
             }
 
             else if (auto action = Buttons::getAction(Pins::BTN_BTM)) {
@@ -35,9 +35,8 @@ namespace Actions {
                 }
 
                 else if (action == Buttons::MEDIUM) Blinds::Position::set(0);
-                else if (action == Buttons::LONG) Blinds::Position::set(Settings::state.currentPosition);
+                else if (action == Buttons::LONG) {}
             }
-
         #endif
     }
 }
