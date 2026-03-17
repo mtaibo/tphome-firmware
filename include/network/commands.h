@@ -26,7 +26,7 @@ namespace Commands {
     };
 
     /* Get, if the device is connected, a 1 */
-    void publishOnline() {
+    void ping() {
         uint8_t payload = 1;
         Mqtt::_client.publish(Mqtt::topics.state,
                             reinterpret_cast<const uint8_t*>(&payload),
@@ -54,9 +54,13 @@ namespace Commands {
 
             switch (static_cast<Cmd>(cmd)) {
                 case Cmd::UP:   Blinds::Position::set(10000);                        break;
-                case Cmd::DOWN: Blinds::Position::set(Settings::prefs.downPosition); break;
+                case Cmd::DOWN:
+                    if (Settings::state.currentPosition > Settings::prefs.downPosition) {
+                        Blinds::Position::set(Settings::prefs.downPosition);
+                    } else Blinds::Position::set(0);
+                    break;
                 case Cmd::STOP: Blinds::Relays::stop();                              break;
-                case Cmd::PING: publishOnline();                                     break;
+                case Cmd::PING: ping();                                              break;
                 default: break;
             }
 
@@ -101,7 +105,6 @@ namespace Commands {
             Settings::save();
         }
     }
-
 }
 
 #endif // COMMANDS_H

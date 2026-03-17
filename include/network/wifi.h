@@ -11,7 +11,7 @@
 #endif
 
 #define ATTEMPT_INTERVAL 5000
-#define MAX_ATTEMPTS 3
+#define MAX_ATTEMPTS 5
 
 namespace Wifi {
 
