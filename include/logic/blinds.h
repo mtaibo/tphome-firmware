@@ -28,39 +28,52 @@ namespace Blinds {
         
     static Motor _motor;
 
-
     namespace Relays {
 
-        inline void up() {
+        inline void stop() {
+
+            /* Stop relays to prevent both relays 
+             * being active simultaneously */
             Hardware::RelayUp::off();
             Hardware::RelayDown::off();
+
+            /* Turn off every movement led to prevent
+             * both leds being active simultaneously */
+            Leds::set(Pins::LED_TOP, Leds::OFF);
+            Leds::set(Pins::LED_BTM, Leds::OFF);
+
+            /* Save settings if there is not more movement */
+            if (_motor.state == IDLE) Settings::saveState();
+        }
+
+        inline void up() {
+            Relays::stop(); // Stop movement before starting movement again
+
+            /* Start next movement */
             Settings::prefs.invertedRelays ? Hardware::RelayDown::on() : Hardware::RelayUp::on();
             Leds::set(Pins::LED_TOP, Leds::ON);
         }
 
         inline void down() {
-            Hardware::RelayUp::off();
-            Hardware::RelayDown::off();
+            Relays::stop(); // Stop movement before starting movement again
+
+            /* Start next movement */
             Settings::prefs.invertedRelays ? Hardware::RelayUp::on() : Hardware::RelayDown::on();
             Leds::set(Pins::LED_BTM, Leds::ON);
         }
-
-        inline void stop() {
-
-            Hardware::RelayUp::off();
-            Hardware::RelayDown::off();
-
-            Leds::set(Pins::LED_TOP, Leds::OFF);
-            Leds::set(Pins::LED_BTM, Leds::OFF);
-
-            if (_motor.state == MOVING) Leds::set(Pins::LED_MID, Leds::ON, Leds::MEDIUM, 0, 50);
-            else Leds::set(Pins::LED_MID, Leds::OFF);
-
-            /* Save settings if there is not more movement */
-            if (_motor.state == IDLE) Settings::saveState();
-        }
     }
 
+    inline void stop() { // Blinds global action
+        if (_motor.state != IDLE) {
+            _motor.state = IDLE;
+            _motor.direction = NONE;
+            _motor.startTime = 0;
+            Settings::state.currentPosition = _motor.nextPosition;
+            
+            Relays::stop();
+            Leds::set(Pins::LED_MID, Leds::ON, Leds::MEDIUM, 0, 50);
+        }
+    }
 
     namespace Position {
 
@@ -92,13 +105,12 @@ namespace Blinds {
 
                         if (_motor.direction == UP) Relays::up();
                         else if (_motor.direction == DOWN) Relays::down();
-
                     } break;
                 }
 
                 case MOVING: {
 
-                    /* Auxiliar variables to prevent calling functions many times */
+                    /* Auxiliar variable */
                     uint16_t currentPosition = Settings::state.currentPosition;
 
                     /* Init all variables and state on first movement */
@@ -126,22 +138,14 @@ namespace Blinds {
                     /* ~~~ STOP MOVEMENT CRITERIA ~~~ */
 
                     // Time excess
-                    if ((now - _motor.startTime) >= totalTime) {
-                        _motor.direction = NONE;
-                        _motor.state = IDLE;
-                        _motor.startTime = 0;
-                        _motor.lastTime = 0;
-                        Settings::state.currentPosition = _motor.nextPosition;
-                        Relays::stop();
-                    }
+                    if ((now - _motor.startTime) >= totalTime) stop();
 
                     // Position excess
                     else if ((_motor.direction == UP && currentPosition >= _motor.nextPosition) || 
                              (_motor.direction == DOWN && currentPosition <= _motor.nextPosition)) {
 
-                        _motor.state = STOPPING;
                         _motor.startTime = 0;
-                        _motor.lastTime = 0;
+                        _motor.state = STOPPING;
                     }
 
                     break;
@@ -150,13 +154,11 @@ namespace Blinds {
                 case STOPPING: {
 
                     if (_motor.startTime == 0) {_motor.startTime = now; break;}
-                    if ((now - _motor.startTime) >= STOPPING_TIME || (_motor.nextPosition != 0 && _motor.nextPosition != 10000)) {
-                        _motor.direction = NONE;
-                        _motor.state = IDLE;
-                        _motor.startTime = 0;
-                        Settings::state.currentPosition = _motor.nextPosition;
-                        Relays::stop();
-                    } break;
+
+                    if ((now - _motor.startTime) >= STOPPING_TIME || 
+                        (_motor.nextPosition != 0 && _motor.nextPosition != 10000)) stop();
+
+                    break;
                 }
             }
         }
@@ -165,8 +167,8 @@ namespace Blinds {
 
             /* Ignore this function call if the device is at asked position */
             if (targetPosition > Settings::state.currentPosition) {
-                if ((targetPosition - Settings::state.currentPosition) < TOL) {Relays::stop(); return;}
-            } else if ((Settings::state.currentPosition - targetPosition) < TOL) {Relays::stop(); return;}
+                if ((targetPosition - Settings::state.currentPosition) < TOL) return;
+            } else if ((Settings::state.currentPosition - targetPosition) < TOL) return;
 
             /* Determine new motor direction and position from current and target position */
             targetPosition = ((targetPosition + 50) / 100) * 100;  // Round target_position

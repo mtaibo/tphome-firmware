@@ -54,7 +54,7 @@ namespace Actions {
                 }
 
                 else if (auto action = Buttons::getAction(Pins::BTN_MID)) {
-                    if (action == Buttons::SHORT) Blinds::Relays::stop();
+                    if (action == Buttons::SHORT) Blinds::stop();
                     else if (action == Buttons::MEDIUM) {}
                     else if (action == Buttons::LONG) {}
                 }
