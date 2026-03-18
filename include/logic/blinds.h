@@ -10,10 +10,10 @@
     #include "hardware/bk7231n/hardware.h"
 #endif
 
-#define TOL 50 // Macro to compare different positions or times
-#define STOPPING_TIME 2000 // 2.00s - Macro for time running after reaching max position
-
 namespace Blinds {
+
+    static constexpr uint16_t TOL = 50; // Macro to compare different positions or times
+    static constexpr uint32_t STOPPING_TIME = 2000; // 2.00s - Macro for time running after reaching max position
 
     enum State { IDLE, WAITING, MOVING, STOPPING };
     enum Direction { NONE, UP, DOWN };
