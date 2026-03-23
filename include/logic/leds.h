@@ -38,9 +38,9 @@ namespace Leds {
                 state.mode = mode;
                 state.state = (mode == ON);
                 state.interval = speed;
-                state.counter = blinks * 2;
+                state.counter = (mode == BLINK) ? (blinks * 2) : 0; // Limpia el contador si no es blink
                 state.lastTime = (uint16_t)(millis() / 10);
-                state.offTime = (duration > 0) ? ((millis() / 10) + duration) : 0;
+                state.offTime = (duration > 0) ? ((uint16_t)(millis() / 10) + duration) : 0;
                 
                 /* Interaction with hardware */
                 Hardware::setState(pin, state.state); return;
@@ -68,7 +68,7 @@ namespace Leds {
             if (state.pin == Pins::NO_PIN) continue;
 
             /* Duration control */
-            if (state.offTime > 0 && now >= state.offTime) {
+            if (state.offTime > 0 && (int16_t)(now - state.offTime) >= 0) {
                 Hardware::setState(state.pin, false);
                 state.pin = Pins::NO_PIN; continue;
             } 

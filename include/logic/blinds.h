@@ -71,6 +71,7 @@ namespace Blinds {
             Settings::state.currentPosition = _motor.nextPosition;
             
             Relays::stop();
+            Leds::set(Pins::LED_MID, Leds::OFF);
             Leds::set(Pins::LED_MID, Leds::ON, Leds::MEDIUM, 0, 50);
         }
     }
