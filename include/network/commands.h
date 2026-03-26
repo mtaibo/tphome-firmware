@@ -13,6 +13,7 @@ namespace Commands {
             DOWN = 0xC1,
             STOP = 0xC2,
             PING = 0xC3,
+            STATE = 0xC4,
         };
 
     #elif defined(DEVICE_TYPE_LIGHT)
@@ -34,7 +35,10 @@ namespace Commands {
     }
 
     /* Report blind state while moving */
-    void publishState(uint8_t position, uint8_t state) {
+    void publishState() {
+
+        uint8_t position = (uint8_t) (Settings::state.currentPosition / 100);
+        uint8_t state = (uint8_t) Blinds::_motor.state;
 
         struct __attribute__((packed)) State {
             uint8_t position;
@@ -61,6 +65,7 @@ namespace Commands {
                     break;
                 case Cmd::STOP: Blinds::stop(); break;
                 case Cmd::PING: ping(); break;
+                case Cmd::STATE: publishState(); break;
                 default: break;
             }
 

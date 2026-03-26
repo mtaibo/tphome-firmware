@@ -2,7 +2,6 @@
 #define BLINDS_H
 
 #include "settings.h"
-#include "commands.h"
 #include "leds.h"
 
 #if defined(DEVICE_HARDWARE_ESP8266)
@@ -10,6 +9,11 @@
 #elif defined(DEVICE_HARDWARE_BK7231N)
     #include "hardware/bk7231n/hardware.h"
 #endif
+
+/* Forward declaration */
+namespace Commands {
+    void publishState();
+}
 
 namespace Blinds {
 
@@ -77,10 +81,7 @@ namespace Blinds {
             Leds::set(Pins::LED_MID, Leds::OFF);
             Leds::set(Pins::LED_MID, Leds::ON, Leds::MEDIUM, 0, 50);
 
-            Commands::publishState(
-                (uint8_t)(Settings::state.currentPosition / 100), 
-                (uint8_t)_motor.state
-            );
+            Commands::publishState();
         }
     }
 
@@ -110,10 +111,7 @@ namespace Blinds {
                         _motor.waitingTime = now;
                         _motor.statePublishTime = now;
 
-                        Commands::publishState(
-                            (uint8_t)(Settings::state.currentPosition / 100), 
-                            (uint8_t)_motor.state
-                        );
+                        Commands::publishState();
 
                         if (_motor.direction == UP) Relays::up();
                         else if (_motor.direction == DOWN) Relays::down();
@@ -128,10 +126,7 @@ namespace Blinds {
                     /* --- Publish new state --- */
                     if (now - _motor.statePublishTime >= 1000) { 
                         _motor.statePublishTime = now;
-                        Commands::publishState(
-                            (uint8_t)(currentPosition / 100), 
-                            (uint8_t)_motor.state
-                        );
+                        Commands::publishState();
                     }
 
                     /* Init all variables and state on first movement */
