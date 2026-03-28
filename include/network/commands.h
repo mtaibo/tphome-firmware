@@ -3,6 +3,7 @@
 
 #include "blinds.h"
 #include "mqtt.h"
+#include "ota.h"
 
 namespace Commands {
 
@@ -14,6 +15,7 @@ namespace Commands {
             STOP = 0xC2,
             PING = 0xC3,
             STATE = 0xC4,
+            OTA = 0xC5,
         };
 
     #elif defined(DEVICE_TYPE_LIGHT)
@@ -66,6 +68,7 @@ namespace Commands {
                 case Cmd::STOP: Blinds::stop(); break;
                 case Cmd::PING: ping(); break;
                 case Cmd::STATE: publishState(); break;
+                case Cmd::OTA: OTA::start(); break;
                 default: break;
             }
 
