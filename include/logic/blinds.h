@@ -75,7 +75,10 @@ namespace Blinds {
             _motor.state = IDLE;
             _motor.direction = NONE;
             _motor.startTime = 0;
-            Settings::state.currentPosition = _motor.nextPosition;
+
+            if (_motor.nextPosition > Settings::state.currentPosition)
+                if ((_motor.nextPosition - Settings::state.currentPosition) < TOL)
+                    Settings::state.currentPosition = _motor.nextPosition;
             
             Relays::stop();
             Leds::set(Pins::LED_MID, Leds::OFF);
@@ -140,8 +143,8 @@ namespace Blinds {
 
                     /* Calculate delta time and delta position to modify current position */
                     uint32_t dt = now - _motor.lastTime; _motor.lastTime = now;
-                    uint32_t totalTime = ((_motor.direction == DOWN) ? (uint32_t) Settings::prefs.downTime : (uint32_t) Settings::prefs.upTime) * 10;
-                    uint16_t movedPosition = (dt * 10000) / totalTime;
+                    uint32_t totalTime = (uint32_t)((_motor.direction == DOWN) ? Settings::prefs.downTime : Settings::prefs.upTime) * 10;
+                    uint16_t movedPosition = (uint16_t)((dt * 10000) / totalTime);
 
                     /* Move current position (with excess checks) */
                     if (_motor.direction == DOWN) (currentPosition > movedPosition) ? currentPosition -= movedPosition : currentPosition = 0;
