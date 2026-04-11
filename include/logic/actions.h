@@ -38,7 +38,7 @@ namespace Actions {
                 }
 
                 else if (auto action = Buttons::getAction(Pins::BTN_BTM)) {
-                    if (action == Buttons::SHORT) {} // OTA new firmware
+                    if (action == Buttons::SHORT) Settings::reboot();
                     else if (action == Buttons::MEDIUM) {}
                     else if (action == Buttons::LONG) {}
                 }
