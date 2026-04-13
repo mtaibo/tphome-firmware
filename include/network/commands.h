@@ -66,21 +66,6 @@ namespace Commands {
                             sizeof(State));
     }
 
-    void publishID() {
-
-        delay(random(50, 1500)); // Random delay to prevent all devices publishing at the same time
-
-        DeviceID id;
-
-        id.type   = Settings::config.deviceID[0];
-        id.zone   = (uint8_t)atoi(Settings::config.deviceID + 1); 
-        id.device = (uint8_t)atoi(Settings::config.deviceID + 3);
-
-        Mqtt::_client.publish(Mqtt::topics.state, 
-                            (uint8_t*) &id, 
-                            sizeof(DeviceID));
-    }
-
     static void handleCmd(uint8_t cmd) {
 
         #if defined(DEVICE_TYPE_BLIND)
@@ -137,7 +122,10 @@ namespace Commands {
         if (length == 0) return;
 
         /* Command for global topic */
-        if (strcmp(topic, Mqtt::topics.global) == 0) publishID();
+        if (strcmp(topic, Mqtt::topics.global) == 0) {
+            delay(random(50, 1000)); // Random delay to prevent all devices publishing at the same time
+            if (payload[0] == 0x01) ping();
+        }
 
         /* Command for non-configured deviceID */
         if (strlen(Settings::config.deviceID) == 4) {
