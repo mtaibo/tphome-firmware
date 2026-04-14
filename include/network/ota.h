@@ -12,10 +12,7 @@ namespace OTA {
         Leds::off();
         
         /* Building firmware direction */
-        snprintf(url, sizeof(url), "http://%s/firmware/%s.bin", 
-            Settings::config.mqttIP, 
-            Settings::config.deviceID
-        );
+        snprintf(url, sizeof(url), "http://%s:8000/firmware", Settings::config.mqttIP);
 
         WiFiClient client;
         ESPhttpUpdate.update(client, url);
