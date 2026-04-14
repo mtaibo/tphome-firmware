@@ -10,6 +10,7 @@ namespace Sizes {
     static constexpr uint8_t ID          =  8;
     static constexpr uint8_t MQTT        = 16;
     static constexpr uint8_t WIFI        = 32;
+    static constexpr uint8_t VERSION     =  4;
     static constexpr uint8_t MQTT_BUFFER = 64;
 }
 

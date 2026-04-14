@@ -24,7 +24,7 @@ namespace Commands {
     #if defined(DEVICE_TYPE_BLIND)
 
         enum class AdminCmd : uint8_t {
-            OTA       = 0xA0, // No payload
+            OTA       = 0xA0, // 3 bytes payload with firmware version
             REBOOT    = 0xA1, // No payload
             RESET_MEM = 0xA2, // No payload
             GET_INFO  = 0xA3, // No payload
@@ -86,14 +86,20 @@ namespace Commands {
         /* Info struct to provide current info stored on device*/
         struct __attribute__((packed)) Info {
             DeviceID id;                // 3 bytes
-            uint8_t padding;            // 1 byte for the struct aligment
+            uint8_t version[3];         // 3 byte
             uint8_t mac[2];             // 2 bytes
             Settings::Prefs prefs;      // 7 bytes
         } info;
 
         info.id = ID;
+
+        info.version[0] = Settings::config.version[0];
+        info.version[1] = Settings::config.version[1];
+        info.version[2] = Settings::config.version[2];
+
         info.mac[0] = MAC[4];
         info.mac[1] = MAC[5];
+
         info.prefs = Settings::prefs;
 
         Mqtt::_client.publish(
@@ -134,7 +140,13 @@ namespace Commands {
         const uint8_t dataLen = length - 1;
 
         switch (cmd) {
-            case AdminCmd::OTA: if (dataLen == 0) OTA::start(); break;
+            case AdminCmd::OTA: 
+                if (dataLen == 3) {
+                    memcpy(&Settings::config.version, data, 3);
+                    Settings::save();
+                    OTA::start(); 
+                } break;
+
             case AdminCmd::REBOOT: if (dataLen == 0) Settings::reboot(); break;
             case AdminCmd::RESET_MEM: if (dataLen == 0) Settings::reset(); break;
 

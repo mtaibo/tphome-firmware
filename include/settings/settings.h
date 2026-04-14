@@ -20,6 +20,9 @@ namespace Settings {
         char mqttUser[Sizes::MQTT];
         char mqttPass[Sizes::MQTT];
         uint16_t mqttPort;
+
+        // Firmware version
+        uint8_t version[Sizes::VERSION];
     };
 
     #if defined(DEVICE_TYPE_BLIND)
